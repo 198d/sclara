@@ -1,6 +1,6 @@
 import time
 
-from sclara import simple_runner, greenlet_runner as runner
+from sclara import greenlet_runner as runner
 
 
 with runner() as (description, test):
