@@ -1,0 +1,8 @@
+Sclara - Lightweight Python Test DSL
+====================================
+
+* Readable, organized test cases written in Python
+* Core functionality exposed entirely through context managers
+* Implicitly nested setup and teardown methods for test cases
+* Greenlet-based unittest.TestSuite implementation for concurrent
+  test case generation and execution
