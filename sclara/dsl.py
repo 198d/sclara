@@ -5,10 +5,7 @@ import types
 
 from greenlet import greenlet
 
-
-context_stack = []
-cases = []
-
+import sclara
 
 class GreenSuite(unittest.TestSuite):
     def __iter__(self):
@@ -25,14 +22,13 @@ class simple_runner(object):
         return description, test
 
     def __exit__(self, *args):
-        global cases
-        suite = unittest.TestSuite(cases)
+        suite = unittest.TestSuite(sclara.default_app.cases)
         unittest.TextTestRunner().run(suite)
-        cases = []
 
 
 class greenlet_runner(object):
     def __enter__(self):
+        sclara.default_app.test = green_test
         green_test.glet = greenlet(self.runner)
         green_test.glet.switch()
         return description, green_test
@@ -53,11 +49,11 @@ class description(object):
         self.desc = desc
 
     def __enter__(self):
-        context_stack.append(self)
+        sclara.default_app.stack.append(self)
         return self.setup, self.teardown
 
     def __exit__(self, *args):
-        context_stack.pop()
+        sclara.default_app.stack.pop()
         return False
 
     def setup(self, func):
@@ -75,11 +71,11 @@ class test(object):
 
     def __init__(self, desc):
         self.desc = desc
-        self.current_context = context_stack[-1]
+        self.current_context = sclara.default_app.stack[-1]
 
     def __enter__(self):
         execution_context = self.ExecutionContext()
-        for description in context_stack:
+        for description in sclara.default_app.stack:
             if description.setup_func:
                 description.setup_func(execution_context)
         self.execution_context = execution_context
@@ -87,14 +83,14 @@ class test(object):
 
     def __exit__(self, type_, value, traceback):
         try:
-            for description in context_stack:
+            for description in sclara.default_app.stack:
                 if description.teardown_func:
                     description.teardown_func(self.execution_context)
         except:
             type_, value, traceback = sys.exc_info()
         self._clear_context_from_stack()
 
-        prefix = " ".join([c.desc for c in context_stack])
+        prefix = " ".join([c.desc for c in sclara.default_app.stack])
         test_statement = "{} {}".format(prefix, self.desc)
         if type_:
             def test_method(self):
@@ -109,7 +105,7 @@ class test(object):
             {test_method.__name__: test_method})
         test_case = test_case_class(test_method.__name__)
 
-        cases.append(test_case)
+        sclara.default_app.cases.append(test_case)
 
         return True
 
@@ -127,5 +123,5 @@ class green_test(test):
 
     def __exit__(self, *args):
         super(green_test, self).__exit__(*args)
-        self.glet.switch(cases.pop())
+        self.glet.switch(sclara.default_app.cases.pop())
         return True

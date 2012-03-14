@@ -1,9 +1,9 @@
 import time
 
-from sclara import greenlet_runner as runner
+from sclara import description, test, greenlet_runner as runner
 
 
-with runner() as (description, test):
+with runner():
     with description('sclara') as (setup, teardown):
         @setup
         def setup(context):
