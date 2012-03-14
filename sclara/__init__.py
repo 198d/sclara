@@ -1,23 +1,29 @@
 class App(object):
     cases = []
     stack = []
-    description = None
-    test = None
+    runners = []
 
     def setup(self, func):
         return self.stack[-1].setup(func)
 
     def teardown(self, func):
         return self.stack[-1].teardown(func)
+
+    @property
+    def description(self):
+        return self.runner.description
+
+    @property
+    def test(self):
+        return self.runner.test
+
+    @property
+    def runner(self):
+        return self.runners[-1]
 default_app = App()
 
 
-import dsl
-
-
-default_app.description = dsl.description
-default_app.test = dsl.test
-
+from dsl.runner import greenlet_runner, delayed_runner
 
 def description(*args):
     return default_app.description(*args)
@@ -29,9 +35,5 @@ def teardown(func):
     return default_app.teardown(func)
 
 
-simple_runner = dsl.simple_runner
-greenlet_runner = dsl.greenlet_runner
-
-
-__all__ = ['description', 'test', 'setup', 'teardown', 'simple_runner',
+__all__ = ['description', 'test', 'setup', 'teardown', 'delayed_runner',
     'greenlet_runner', 'default_app']

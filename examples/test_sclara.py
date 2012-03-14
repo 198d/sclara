@@ -1,10 +1,10 @@
 import time
 
 from sclara import description, test, setup, teardown, \
-    greenlet_runner, simple_runner
+    greenlet_runner, delayed_runner
 
 
-with simple_runner():
+with delayed_runner():
     with description('sclara'):
         @setup
         def _setup(context):
@@ -44,7 +44,7 @@ with simple_runner():
                 assert raised
 
 
-with greenlet_runner() as (description, test):
+with greenlet_runner():
     with description('sloooowwwww tests'):
         with test('print dots as they happen'):
             time.sleep(1)
