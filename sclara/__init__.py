@@ -1,22 +1,22 @@
-from pprint import pprint
-
-import dsl
-
-
 class App(object):
     cases = []
     stack = []
-    description = dsl.description
-    test = dsl.test
+    description = None
+    test = None
 
     def setup(self, func):
         return self.stack[-1].setup(func)
 
     def teardown(self, func):
         return self.stack[-1].teardown(func)
-
-
 default_app = App()
+
+
+import dsl
+
+
+default_app.description = dsl.description
+default_app.test = dsl.test
 
 
 def description(*args):
