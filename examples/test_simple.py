@@ -1,17 +1,17 @@
-from sclara import test, description
+from sclara import test, description, setup, teardown
 
 
-with description('Describing something interesting') as (setup, teardown):
+with description('Describing something interesting'):
     @setup
-    def setup(context):
+    def _setup(context):
         context.foo = 'foo'
 
     with test('that has a test at the top level') as context:
         assert context.foo == 'foo'
 
-    with description('that has many levels of interest') as (setup, teardown):
+    with description('that has many levels of interest'):
         @setup
-        def setup(context):
+        def _setup(context):
             context.bar = 'bar'
 
         with test('and then testing it') as context:

@@ -1,12 +1,13 @@
 import time
 
-from sclara import description, test, greenlet_runner as runner
+from sclara import description, test, setup, teardown,
+    greenlet_runner as runner
 
 
 with runner():
-    with description('sclara') as (setup, teardown):
+    with description('sclara'):
         @setup
-        def setup(context):
+        def _setup(context):
             context.foo = 'bar'
             context.baz = 'baz'
 
@@ -19,9 +20,9 @@ with runner():
         with test('fails like a normal test'):
             assert False
 
-        with description('with nested descriptions') as (setup, teardown):
+        with description('with nested descriptions'):
             @setup
-            def setup(context):
+            def _setup(context):
                 context.bar = 'foo'
                 context.baz = 'zab'
 
