@@ -17,8 +17,9 @@ class GreenSuite(unittest.TestSuite):
 
 class green_test(test):
     def __exit__(self, *args):
+        super(green_test, self).__exit__(*args)
         default_app.runner.glet.switch(default_app.cases.pop())
-        return super(green_test, self).__exit__(*args)
+        return True
 
 
 class runner(object):
