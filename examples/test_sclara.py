@@ -20,6 +20,22 @@ with delayed_runner():
         with test('fails like a normal test'):
             assert False
 
+        with description('during setup'):
+            @setup
+            def _setup(context):
+                raise Exception, 'failed setup'
+
+            with test('fails well'):
+                assert True
+
+        with description('during teardown'):
+            @teardown
+            def _teardown(context):
+                raise Exception, 'failed teardown'
+
+            with test('fails well'):
+                assert True
+
         with description('with nested descriptions'):
             @setup
             def _setup(context):

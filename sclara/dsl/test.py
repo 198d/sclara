@@ -35,24 +35,19 @@ class test(object):
 
     def __init__(self, desc):
         self.desc = desc
+        self.setup_exc_info = None
+        self.execution_context = self.ExecutionContext()
         self.current_context = default_app.stack[-1]
 
     def __enter__(self):
-        execution_context = self.ExecutionContext()
-        for description in default_app.stack:
-            if description.setup_func:
-                description.setup_func(execution_context)
-        self.execution_context = execution_context
-        return self.execution_context
+        return self._setup()
 
     def __exit__(self, type_, value, traceback):
-        try:
-            for description in default_app.stack:
-                if description.teardown_func:
-                    description.teardown_func(self.execution_context)
-        except:
-            type_, value, traceback = sys.exc_info()
-        self._clear_context_from_stack()
+        teardown_exc_info = self._teardown()
+        if self.setup_exc_info:
+            type_, value, traceback = self.setup_exc_info
+        elif teardown_exc_info:
+            type_, value, traceback = teardown_exc_info
 
         prefix = " ".join([c.desc for c in default_app.stack])
         test_statement = "{} {}".format(prefix, self.desc)
@@ -72,6 +67,25 @@ class test(object):
         default_app.cases.append(test_case)
 
         return True
+
+    def _setup(self):
+        try:
+            for description in default_app.stack:
+                if description.setup_func:
+                    description.setup_func(self.execution_context)
+        except:
+            self.setup_exc_info = sys.exc_info()
+        return self.execution_context
+
+    def _teardown(self):
+        self._clear_context_from_stack()
+
+        try:
+            for description in default_app.stack:
+                if description.teardown_func:
+                    description.teardown_func(self.execution_context)
+        except:
+            return sys.exc_info()
 
     def _clear_context_from_stack(self):
         stack = inspect.stack()
