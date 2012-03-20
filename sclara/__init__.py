@@ -1,3 +1,6 @@
+import types
+
+
 class App(object):
     cases = []
     stack = []
@@ -23,15 +26,31 @@ class App(object):
 default_app = App()
 
 
+import dsl
 from dsl.runner import greenlet_runner, delayed_runner
 
+
 def description(*args):
-    return default_app.description(*args)
+    try:
+        return default_app.description(*args)
+    except IndexError:
+        return dsl.description(*args)
 def test(*args):
-    return default_app.test(*args)
+    try:
+        return default_app.test(*args)
+    except IndexError:
+        return dsl.test(*args)
 def setup(func):
+    # nose finds this and tries to run it when setting up a test suite; hack
+    # to stop that
+    if not isinstance(func, types.FunctionType):
+        return None
     return default_app.setup(func)
 def teardown(func):
+    # nose finds this and tries to run it when tearing down a test suite; hack
+    # to stop that
+    if not isinstance(func, types.FunctionType):
+        return None
     return default_app.teardown(func)
 
 

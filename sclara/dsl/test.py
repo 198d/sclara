@@ -5,6 +5,9 @@ import sys
 from sclara import default_app
 
 
+__test__ = False
+
+
 class description(object):
     setup_func = None
     teardown_func = None
