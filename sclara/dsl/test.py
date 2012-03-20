@@ -39,42 +39,28 @@ class test(object):
     def __init__(self, desc):
         self.desc = desc
         self.setup_exc_info = None
+        self.teardown_exc_info = None
         self.execution_context = self.ExecutionContext()
-        self.current_context = default_app.stack[-1]
 
     def __enter__(self):
+        default_app.stack.append(self)
         return self._setup()
 
     def __exit__(self, type_, value, traceback):
-        teardown_exc_info = self._teardown()
+        self._teardown()
         if self.setup_exc_info:
             type_, value, traceback = self.setup_exc_info
-        elif teardown_exc_info:
-            type_, value, traceback = teardown_exc_info
+        elif self.teardown_exc_info:
+            type_, value, traceback = self.teardown_exc_info
 
-        prefix = " ".join([c.desc for c in default_app.stack])
-        test_statement = "{} {}".format(prefix, self.desc)
-        if type_:
-            def test_method(self):
-                raise type_, value, traceback
-        else:
-            def test_method(self):
-                pass
-        test_method.__name__ = test_statement
-        test_method.__doc__ = test_statement
-
-        test_case_class = type("TestCase", (unittest.TestCase,),
-            {test_method.__name__: test_method})
-        test_case = test_case_class(test_method.__name__)
-
-        default_app.cases.append(test_case)
-
+        default_app.deliver_result((type_, value, traceback))
+        default_app.stack.pop()
         return True
 
     def _setup(self):
         try:
             for description in default_app.stack:
-                if description.setup_func:
+                if getattr(description, 'setup_func', None):
                     description.setup_func(self.execution_context)
         except:
             self.setup_exc_info = sys.exc_info()
@@ -82,13 +68,12 @@ class test(object):
 
     def _teardown(self):
         self._clear_context_from_stack()
-
         try:
             for description in default_app.stack:
-                if description.teardown_func:
+                if getattr(description, 'teardown_func', None):
                     description.teardown_func(self.execution_context)
         except:
-            return sys.exc_info()
+            self.teardown_exc_info = sys.exc_info()
 
     def _clear_context_from_stack(self):
         stack = inspect.stack()
