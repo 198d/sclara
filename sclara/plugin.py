@@ -4,7 +4,7 @@ import nose
 from nose.selector import TestAddress
 
 from sclara.builder import generate_test_cases
-from sclara.dsl.runner import test_runner
+from sclara.runner import test_runner
 
 
 class nose_runner(test_runner):

@@ -32,7 +32,8 @@ class App(object):
 default_app = App()
 
 
-from dsl import test, description, greenlet_runner, delayed_runner
+from .dsl import test, description
+from .runner import greenlet_runner, delayed_runner
 
 
 def setup(func):

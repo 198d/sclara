@@ -2,7 +2,6 @@ import unittest
 from greenlet import greenlet
 
 from sclara import default_app
-from .test import test, description
 
 
 class GreenSuite(unittest.TestSuite):
