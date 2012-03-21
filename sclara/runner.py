@@ -1,7 +1,7 @@
 import unittest
 from greenlet import greenlet
 
-from sclara import default_app
+from sclara.session import session
 
 
 class GreenSuite(unittest.TestSuite):
@@ -19,11 +19,11 @@ class test_runner(object):
         self.cases = []
 
     def __enter__(self):
-        default_app.runners.append(self)
+        session.runners.append(self)
         return self
 
     def __exit__(self, *args):
-        default_app.runners.pop()
+        session.runners.pop()
 
     def handle_result(self, exc_info):
         type_, value, traceback = exc_info
@@ -34,8 +34,8 @@ class test_runner(object):
         else:
             def test_method(self):
                 pass
-        test_method.__name__ = default_app.test_statement
-        test_method.__doc__ = default_app.test_statement
+        test_method.__name__ = session.test_statement
+        test_method.__doc__ = session.test_statement
 
         test_case_class = type("TestCase", (unittest.TestCase,),
             {test_method.__name__: test_method})

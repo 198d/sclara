@@ -2,7 +2,7 @@ import inspect
 import unittest
 import sys
 
-from sclara import default_app
+from sclara.session import session
 
 
 __test__ = False
@@ -16,11 +16,11 @@ class description(object):
         self.desc = desc
 
     def __enter__(self):
-        default_app.stack.append(self)
+        session.stack.append(self)
         return self.setup, self.teardown
 
     def __exit__(self, *args):
-        default_app.stack.pop()
+        session.stack.pop()
         return False
 
     def setup(self, func):
@@ -43,7 +43,7 @@ class test(object):
         self.execution_context = self.ExecutionContext()
 
     def __enter__(self):
-        default_app.stack.append(self)
+        session.stack.append(self)
         return self._setup()
 
     def __exit__(self, type_, value, traceback):
@@ -53,13 +53,13 @@ class test(object):
         elif self.teardown_exc_info:
             type_, value, traceback = self.teardown_exc_info
 
-        default_app.deliver_result((type_, value, traceback))
-        default_app.stack.pop()
+        session.deliver_result((type_, value, traceback))
+        session.stack.pop()
         return True
 
     def _setup(self):
         try:
-            for description in default_app.stack:
+            for description in session.stack:
                 if getattr(description, 'setup_func', None):
                     description.setup_func(self.execution_context)
         except:
@@ -69,7 +69,7 @@ class test(object):
     def _teardown(self):
         self._clear_context_from_stack()
         try:
-            for description in default_app.stack:
+            for description in session.stack:
                 if getattr(description, 'teardown_func', None):
                     description.teardown_func(self.execution_context)
         except:
