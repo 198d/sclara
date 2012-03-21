@@ -16,11 +16,11 @@ class description(object):
         self.desc = desc
 
     def __enter__(self):
-        session.stack.append(self)
+        session.push(self)
         return self.setup, self.teardown
 
     def __exit__(self, *args):
-        session.stack.pop()
+        session.pop()
         return False
 
     def setup(self, func):
@@ -43,7 +43,7 @@ class test(object):
         self.execution_context = self.ExecutionContext()
 
     def __enter__(self):
-        session.stack.append(self)
+        session.push(self)
         return self._setup()
 
     def __exit__(self, type_, value, traceback):
@@ -53,14 +53,17 @@ class test(object):
         elif self.teardown_exc_info:
             type_, value, traceback = self.teardown_exc_info
 
-        session.deliver_result((type_, value, traceback))
-        session.stack.pop()
+        closest_runner = session.closest('runner')
+        if closest_runner:
+            closest_runner.handle_result((type_, value, traceback))
+
+        session.pop()
         return True
 
     def _setup(self):
         try:
-            for description in session.stack:
-                if getattr(description, 'setup_func', None):
+            for description in session.all('description'):
+                if description.setup_func:
                     description.setup_func(self.execution_context)
         except:
             self.setup_exc_info = sys.exc_info()
@@ -69,8 +72,8 @@ class test(object):
     def _teardown(self):
         self._clear_context_from_stack()
         try:
-            for description in session.stack:
-                if getattr(description, 'teardown_func', None):
+            for description in session.all('description'):
+                if description.teardown_func:
                     description.teardown_func(self.execution_context)
         except:
             self.teardown_exc_info = sys.exc_info()

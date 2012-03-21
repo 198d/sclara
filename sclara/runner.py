@@ -15,15 +15,16 @@ class GreenSuite(unittest.TestSuite):
 
 
 class test_runner(object):
-    def __init__(self):
+    def __init__(self, desc=''):
+        self.desc = desc
         self.cases = []
 
     def __enter__(self):
-        session.runners.append(self)
+        session.push(self, 'runner')
         return self
 
     def __exit__(self, *args):
-        session.runners.pop()
+        session.pop()
 
     def handle_result(self, exc_info):
         type_, value, traceback = exc_info
@@ -34,8 +35,8 @@ class test_runner(object):
         else:
             def test_method(self):
                 pass
-        test_method.__name__ = session.test_statement
-        test_method.__doc__ = session.test_statement
+        test_method.__name__ = session.description
+        test_method.__doc__ = session.description
 
         test_case_class = type("TestCase", (unittest.TestCase,),
             {test_method.__name__: test_method})
@@ -52,8 +53,8 @@ class delayed_runner(test_runner):
 
 
 class greenlet_runner(test_runner):
-    def __init__(self):
-        super(greenlet_runner, self).__init__()
+    def __init__(self, desc=''):
+        super(greenlet_runner, self).__init__(desc)
         self.glet = greenlet(self.run)
         self.glet.switch()
 

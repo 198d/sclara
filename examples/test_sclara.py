@@ -4,7 +4,7 @@ from sclara import description, test, setup, teardown, \
     greenlet_runner, delayed_runner
 
 
-with delayed_runner():
+with delayed_runner('delayed runner for'):
     with description('sclara'):
         @setup
         def _setup(context):
@@ -60,7 +60,7 @@ with delayed_runner():
                 assert raised
 
 
-with greenlet_runner():
+with greenlet_runner('greenlet runner with'):
     with description('sloooowwwww tests'):
         with test('print dots as they happen'):
             time.sleep(1)
