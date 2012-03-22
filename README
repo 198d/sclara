@@ -1,8 +1,38 @@
-Sclara - Lightweight Python Test DSL
-====================================
+Sclara
+======
 
-* Readable, organized test cases written in Python
-* Core functionality exposed entirely through context managers
-* Implicitly nested setup and teardown methods for test cases
-* Greenlet-based unittest.TestSuite implementation for concurrent
-  test case generation and execution
+Sclara is a lightweight testing DSL written in Python. It makes heavy
+use of context managers to describe and define test cases while allowing
+the developer to focus on describing the system under test rather than
+on writing complicated OO class-based test cases that unittest
+encourages. It is similar to other projects such as konira and lettuce,
+however, tests are written in pure Python and can be run with the Python
+interpreter directly.
+
+
+Install
+-------
+
+    $ python setup.py install
+
+
+Contribute
+----------
+
+    1. Fork on github at http://github.com/198d/sclara
+    2. ... Hack ...
+    3. Send pull request
+
+
+Author
+------
+
+John MacKenzie <john@nineteeneightd.com>
+
+
+History
+-------
+
+Started as a simple comment made to a friend at the 2012 PyCon TiP BoF:
+'How about an RSpec clone written entirely with context managers'. The
+name is a mangling of the location of PyCon that year: s(anta)clara.
