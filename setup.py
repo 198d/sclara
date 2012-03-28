@@ -7,5 +7,5 @@ setup(name='sclara',
       author_email='john@nineteeneightd.com',
       url='http://github.com/198d/sclara',
       install_requires=['greenlet >=0.3.4,<0.4.0',
-                        'nose >=1.1.2']
+                        'nose >=1.1.2'],
       packages=['sclara'])
