@@ -16,6 +16,8 @@ with delayed_runner('delayed runner for'):
                 context.bar
             except AttributeError:
                 pass
+            else:
+                assert False
 
         with test('fails like a normal test'):
             assert False
@@ -42,10 +44,10 @@ with delayed_runner('delayed runner for'):
                 context.bar = 'foo'
                 context.baz = 'zab'
 
-            with test('has access to inner setup context') as context:
+            with test('has access to outer setup context') as context:
                 assert context.foo == 'bar'
 
-            with test('has access to outer setup context') as context:
+            with test('has access to inner setup context') as context:
                 assert context.bar == 'foo'
 
             with test('overrides outer setup context with inner context') as context:
