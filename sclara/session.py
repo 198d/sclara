@@ -20,19 +20,3 @@ class Session(list):
             if tag == frame[0]:
                 yield frame[1]
 session = Session()
-
-
-def setup(func):
-    # nose finds this and tries to run it when setting up a test suite; hack
-    # to stop that
-    if not isinstance(func, types.FunctionType):
-        return None
-    return session.closest('description').setup(func)
-
-
-def teardown(func):
-    # nose finds this and tries to run it when tearing down a test suite; hack
-    # to stop that
-    if not isinstance(func, types.FunctionType):
-        return None
-    return session.closest('description').teardown(func)

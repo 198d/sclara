@@ -1,6 +1,7 @@
 import inspect
 import unittest
 import sys
+from pprint import pprint
 
 from sclara.session import session
 
@@ -41,9 +42,11 @@ class test(object):
         self.setup_exc_info = None
         self.teardown_exc_info = None
         self.execution_context = self.ExecutionContext()
+        self.calling_frame = inspect.currentframe().f_back
 
     def __enter__(self):
         session.push(self)
+        self._record_context_functions()
         return self._setup()
 
     def __exit__(self, type_, value, traceback):
@@ -85,3 +88,15 @@ class test(object):
             for k, v in frame.f_locals.items():
                 if isinstance(v, self.ExecutionContext):
                     del frame.f_locals[k]
+
+    def _record_context_functions(self):
+        description = session.closest('description')
+        setup  = self.calling_frame.f_locals.get('setup', None)
+        teardown = self.calling_frame.f_locals.get('teardown', None)
+
+        if description and not description.setup_func and setup:
+            description.setup_func = setup
+            del self.calling_frame.f_locals['setup']
+        if description and not description.teardown_func and teardown:
+            description.teardown_func = teardown
+            del self.calling_frame.f_locals['teardown']

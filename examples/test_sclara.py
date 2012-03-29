@@ -1,13 +1,11 @@
 import time
 
-from sclara import description, test, setup, teardown, \
-    greenlet_runner, delayed_runner
+from sclara import description, test, greenlet_runner, delayed_runner
 
 
 with delayed_runner('delayed runner for'):
     with description('sclara'):
-        @setup
-        def _setup(context):
+        def setup(context):
             context.foo = 'bar'
             context.baz = 'baz'
 
@@ -23,24 +21,21 @@ with delayed_runner('delayed runner for'):
             assert False
 
         with description('during setup'):
-            @setup
-            def _setup(context):
+            def setup(context):
                 raise Exception, 'failed setup'
 
             with test('fails well'):
                 assert True
 
         with description('during teardown'):
-            @teardown
-            def _teardown(context):
+            def teardown(context):
                 raise Exception, 'failed teardown'
 
             with test('fails well'):
                 assert True
 
         with description('with nested descriptions'):
-            @setup
-            def _setup(context):
+            def setup(context):
                 context.bar = 'foo'
                 context.baz = 'zab'
 

@@ -30,11 +30,11 @@ class TestCaseCollector(ast.NodeVisitor, HelperMixin):
 
 
 class TestMethodBuilder(ast.NodeTransformer, HelperMixin):
-    desc_stack = []
-
     def __init__(self, target_statement):
         super(TestMethodBuilder, self).__init__()
+        self.desc_stack = []
         self.target_statement = target_statement
+        self.found = False
 
     def visit_Module(self, node):
         self.generic_visit(node)
@@ -52,11 +52,12 @@ class TestMethodBuilder(ast.NodeTransformer, HelperMixin):
         if self.is_description(node):
             self.desc_stack.append(node)
             self.generic_visit(node)
-            if not node.body:
-                return None
             self.desc_stack.pop()
+            if not self.found:
+                return None
         elif self.is_test(node):
             if self.target_statement == self.test_statement(node):
+                self.found = True
                 return node
             return None
 
