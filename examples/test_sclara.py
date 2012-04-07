@@ -1,6 +1,7 @@
 import time
 
-from sclara import description, test, greenlet_runner, delayed_runner
+from sclara import description, test, expect, greenlet_runner, \
+    delayed_runner
 
 
 with delayed_runner('delayed runner for'):
@@ -10,29 +11,30 @@ with delayed_runner('delayed runner for'):
             context.baz = 'baz'
 
         with test('does not have access to inner setup context') as context:
-            try:
-                context.bar
-            except AttributeError:
-                pass
-            else:
-                assert False
+            expect(lambda: context.bar).raises(AttributeError)
 
         with test('fails like a normal test'):
-            assert False
+            expect(False)
+
+        with test('expects dictionary pressence'):
+            expect({'key': 'value'}).contains('key')
+
+        with test('fails dictionary absence'):
+            expect({'yek': 'value'}).contains('key')
 
         with description('during setup'):
             def setup(context):
                 raise Exception, 'failed setup'
 
             with test('fails well'):
-                assert True
+                expect(False)
 
         with description('during teardown'):
             def teardown(context):
                 raise Exception, 'failed teardown'
 
             with test('fails well'):
-                assert True
+                expect(False)
 
         with description('with nested descriptions'):
             def setup(context):
@@ -40,31 +42,26 @@ with delayed_runner('delayed runner for'):
                 context.baz = 'zab'
 
             with test('has access to outer setup context') as context:
-                assert context.foo == 'bar'
+                expect(context.foo) == 'bar'
 
             with test('has access to inner setup context') as context:
-                assert context.bar == 'foo'
+                expect(context.bar) == 'foo'
 
             with test('overrides outer setup context with inner context') as context:
-                assert context.baz == 'zab'
+                expect(context.baz) == 'zab'
 
             with test('fails if context object isn\'t bound'):
-                raised = False
-                try:
-                    context.baz
-                except NameError:
-                    raised = True
-                assert raised
+                expect(lambda: context.bar).raises(NameError)
 
 
 with greenlet_runner('greenlet runner with'):
     with description('sloooowwwww tests'):
         with test('print dots as they happen'):
             time.sleep(1)
-            assert True
+            expect(True)
         with test('print failures as they happen, too'):
             time.sleep(2)
-            assert False
+            expect(False)
         with test('print more dots'):
             time.sleep(3)
-            assert True
+            expect(True)
