@@ -1,7 +1,8 @@
 import time
 
-from sclara import description, test, expect, greenlet_runner, \
-    delayed_runner
+from sclara import description, test
+from sclara.expectation import expect
+from sclara.runner import greenlet_runner, delayed_runner
 
 
 with delayed_runner('delayed runner for'):
