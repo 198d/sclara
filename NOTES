@@ -1,0 +1,17 @@
+sclara.App -> sclara.Manager
+sclara.default_app -> sclara.manager
+
+sclara.Manager should be a proper sequence
+
+sclara.dsl.test should do less; move test case generation to the runner
+
+sclara.dsl.description -> sclara.dsl.desc (??)
+
+builder.TestMethodBuilder should be a bit more forgiving when walking
+the AST
+
+Proper tests, written in sclara (duh!)
+
+Better organization/nomenclature
+
+Verify 2.7/3.x compatability
